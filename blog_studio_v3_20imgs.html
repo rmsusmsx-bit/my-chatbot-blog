@@ -1,0 +1,498 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;
+  --border:#333;--text:#e8e8e8;--text2:#999;--text3:#666;
+  --accent:#7c6af7;--accent2:#5a4fd6;--green:#3da86a;--amber:#d49a2a;--red:#d45a5a;
+}
+.wrap{background:var(--bg);min-height:700px;color:var(--text);font-family:var(--font-sans)}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.header-right{font-size:12px;color:var(--text3)}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;gap:2px}
+.tab{padding:10px 16px;font-size:13px;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover:not(.active){color:var(--text)}
+.body{padding:20px}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px}
+.card-title{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;font-weight:500}
+.writing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px}
+.type-selector{display:flex;gap:8px;margin-bottom:12px}
+.type-btn{flex:1;padding:8px;font-size:12px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:var(--bg3);color:var(--text2);transition:all .15s}
+.type-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.input-area{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:10px;resize:none;font-family:var(--font-sans);line-height:1.6}
+.input-area:focus{outline:none;border-color:var(--accent)}
+.input-area::placeholder{color:var(--text3)}
+.sel{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;padding:8px 10px;margin-bottom:8px}
+.sel:focus{outline:none;border-color:var(--accent)}
+.run-btn{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
+.run-btn:hover{background:var(--accent2)}
+.run-btn:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed}
+.result-area{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;font-size:13px;line-height:1.7;color:var(--text);min-height:120px;white-space:pre-wrap;word-break:break-word}
+.result-placeholder{color:var(--text3);font-style:italic}
+.apikey-row{display:flex;gap:8px;margin-bottom:8px}
+.apikey-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px;padding:7px 10px;font-family:var(--font-mono)}
+.apikey-input:focus{outline:none;border-color:var(--accent)}
+.save-key-btn{padding:7px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:12px;cursor:pointer;white-space:nowrap}
+.save-key-btn:hover{color:var(--text)}
+.key-saved{font-size:11px;color:var(--green);margin-top:4px}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.copy-btn{font-size:11px;padding:4px 10px;background:var(--bg4);border:1px solid var(--border);border-radius:5px;color:var(--text2);cursor:pointer;margin-top:8px;float:right}
+.copy-btn:hover{color:var(--text)}
+.api-notice{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.5}
+
+/* 업로드 */
+.upload-zone{border:1.5px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:border-color .2s;background:var(--bg3);position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--accent)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{width:32px;height:32px;margin:0 auto 8px;opacity:.4}
+.upload-text{font-size:13px;color:var(--text2)}
+.upload-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.preview-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.preview-item{position:relative;width:72px;height:72px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.preview-item img{width:100%;height:100%;object-fit:cover}
+.preview-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.75);border:none;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.img-count{font-size:11px;color:var(--text3);margin-top:8px}
+.img-bar-wrap{margin-top:8px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.img-bar{height:4px;background:var(--accent);border-radius:2px;transition:width .3s}
+.img-bar.warn{background:var(--amber)}
+.img-bar.full{background:var(--green)}
+.img-active-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:10px;font-size:11px;background:#1e1a3a;color:#9d8ff7;border:1px solid #3d3470;margin-bottom:8px}
+.img-dot{width:6px;height:6px;border-radius:50%;background:#9d8ff7}
+
+/* 나머지 패널 */
+.seo-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.check-list{list-style:none}
+.check-list li{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--bg4);font-size:13px;color:var(--text2)}
+.check-list li:last-child{border-bottom:none}
+.dot-ok{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px}
+.dot-warn{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:4px}
+.dot-bad{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:4px}
+.dot-none{width:8px;height:8px;border-radius:50%;background:var(--bg4);border:1px solid var(--border);flex-shrink:0;margin-top:4px}
+.keyword-tools{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.tool-link{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s;text-decoration:none}
+.tool-link:hover{border-color:var(--accent)}
+.tool-name{font-size:13px;font-weight:500;color:var(--text)}
+.tool-desc{font-size:11px;color:var(--text3);margin-top:2px}
+.tool-arrow{font-size:14px;color:var(--text3)}
+.thumb-output{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.thumb-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px}
+.thumb-label{color:var(--text3);font-size:11px;margin-bottom:4px}
+.thumb-val{color:var(--text);font-size:13px;font-weight:500;line-height:1.5}
+.tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{padding:2px 8px;background:var(--bg4);border-radius:10px;font-size:11px;color:var(--text2)}
+.keyword-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.kwbadge{padding:4px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;font-size:12px;color:var(--text2);cursor:pointer;transition:all .15s}
+.kwbadge:hover{border-color:var(--accent);color:var(--accent)}
+.divider{height:1px;background:var(--border);margin:14px 0}
+</style>
+
+<div class="wrap">
+  <div class="header">
+    <div class="logo"><div class="logo-dot"></div>Blog Studio</div>
+    <div class="header-right">개인 블로그 통합 솔루션</div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showPanel('writing',this)">포스팅 작성</div>
+    <div class="tab" onclick="showPanel('thumb',this)">썸네일 · 태그 · 제목</div>
+    <div class="tab" onclick="showPanel('seo',this)">SEO 검증</div>
+    <div class="tab" onclick="showPanel('keyword',this)">키워드 리서치</div>
+  </div>
+
+  <div class="body">
+
+    <!-- WRITING -->
+    <div class="panel active" id="panel-writing">
+
+      <div class="card">
+        <div class="card-title">API 키 설정</div>
+        <div class="apikey-row">
+          <input class="apikey-input" type="password" id="apikey" placeholder="sk-ant-api03-..." />
+          <button class="save-key-btn" onclick="saveKey()">저장</button>
+        </div>
+        <div id="key-status"></div>
+      </div>
+
+      <!-- 사진 업로드 (최대 20장) -->
+      <div class="card">
+        <div class="card-title">
+          사진 업로드
+          <span style="color:var(--text3);font-weight:400;font-size:11px;margin-left:6px">최대 20장 · JPG / PNG / WEBP</span>
+        </div>
+        <div class="upload-zone" id="upload-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple id="file-input" onchange="onFileChange(event)" />
+          <svg class="upload-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="6" width="28" height="20" rx="3" stroke="#666" stroke-width="1.5"/>
+            <circle cx="10" cy="13" r="2.5" stroke="#666" stroke-width="1.5"/>
+            <path d="M2 22l7-6 5 5 4-4 7 7" stroke="#666" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M22 10v6M19 13h6" stroke="#9d8ff7" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <div class="upload-text">클릭하거나 사진을 드래그해서 올려주세요</div>
+          <div class="upload-sub">한 번에 여러 장 선택 가능 · 최대 20장까지 업로드</div>
+        </div>
+        <div class="preview-grid" id="preview-grid"></div>
+        <div class="img-bar-wrap" id="img-bar-wrap" style="display:none">
+          <div class="img-bar" id="img-bar"></div>
+        </div>
+        <div class="img-count" id="img-count"></div>
+      </div>
+
+      <div class="type-selector">
+        <button class="type-btn active" onclick="setType('review',this)">후기 포스팅</button>
+        <button class="type-btn" onclick="setType('info',this)">정보성 포스팅</button>
+      </div>
+
+      <div class="writing-grid">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">포스팅 설정</div>
+          <div id="img-active-indicator" style="display:none" class="img-active-badge"><div class="img-dot"></div><span id="img-active-text">사진 0장 분석 포함</span></div>
+          <select class="sel" id="platform">
+            <option value="naver">네이버 블로그 타겟</option>
+            <option value="tistory">티스토리 타겟</option>
+          </select>
+          <select class="sel" id="tone">
+            <option value="친근하고 자연스러운">친근하고 자연스러운 말투</option>
+            <option value="정보성 전문적인">정보성 · 전문적인 말투</option>
+            <option value="간결하고 핵심적인">간결하고 핵심적인 말투</option>
+            <option value="상세하고 설명적인">상세하고 설명적인 말투</option>
+          </select>
+          <textarea class="input-area" id="topic" rows="5" placeholder="소재나 추가 설명을 입력하세요&#10;&#10;사진만 올려도 되고, 설명을 추가하면 더 정확해요&#10;예) 강남 스시 오마카세 후기 - 2인 15만원, 점심 특선"></textarea>
+          <div style="margin-top:10px">
+            <button class="run-btn" id="write-btn" onclick="runWriting()">포스팅 생성하기</button>
+          </div>
+          <p class="api-notice" id="type-desc">후기 포스팅: 경험 중심의 자연스러운 서술로 네이버 노출에 유리한 구조로 작성합니다.</p>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-title">생성 결과</div>
+          <div class="result-area" id="writing-result"><span class="result-placeholder">사진을 올리거나 소재를 입력하고 생성 버튼을 누르세요.</span></div>
+          <button class="copy-btn" onclick="copyResult('writing-result')">복사</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- THUMBNAIL -->
+    <div class="panel" id="panel-thumb">
+      <div class="card">
+        <div class="card-title">소재 입력</div>
+        <textarea class="input-area" id="thumb-topic" rows="3" placeholder="포스팅 소재나 완성된 본문을 붙여넣으세요"></textarea>
+        <select class="sel" style="margin-top:8px" id="thumb-platform">
+          <option value="naver">네이버 타겟</option>
+          <option value="tistory">티스토리 타겟</option>
+        </select>
+        <button class="run-btn" style="margin-top:8px" onclick="runThumb()">제목 · 태그 · 썸네일 추출</button>
+      </div>
+      <div id="thumb-loading" style="display:none;text-align:center;padding:30px;color:var(--text2);font-size:13px"><div class="spinner"></div> 분석 중...</div>
+      <div id="thumb-result-area" style="display:none">
+        <div class="thumb-output" id="thumb-titles"></div>
+        <div class="divider"></div>
+        <div class="card"><div class="card-title">추천 태그</div><div class="tag-list" id="thumb-tags"></div></div>
+        <div class="card" style="margin-top:0"><div class="card-title">썸네일 텍스트 제안</div><div id="thumb-text" style="font-size:13px;color:var(--text);line-height:1.7"></div></div>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="panel" id="panel-seo">
+      <div class="card">
+        <div class="card-title">포스팅 붙여넣기</div>
+        <textarea class="input-area" id="seo-content" rows="5" placeholder="작성한 포스팅 전체 내용을 붙여넣으세요 (제목 포함)"></textarea>
+        <select class="sel" style="margin-top:8px" id="seo-platform">
+          <option value="naver">네이버 SEO 검증</option>
+          <option value="google">구글/티스토리 SEO 검증</option>
+          <option value="both">네이버 + 구글 동시 검증</option>
+        </select>
+        <button class="run-btn" style="margin-top:8px" onclick="runSEO()">SEO 검증 시작</button>
+      </div>
+      <div id="seo-loading" style="display:none;text-align:center;padding:30px;color:var(--text2);font-size:13px"><div class="spinner"></div> 검증 중...</div>
+      <div id="seo-result-area" style="display:none">
+        <div class="seo-grid" id="seo-grid"></div>
+        <div class="card" style="margin-top:14px"><div class="card-title">개선 제안</div><div id="seo-suggestions" style="font-size:13px;color:var(--text2);line-height:1.8"></div></div>
+      </div>
+    </div>
+
+    <!-- KEYWORD -->
+    <div class="panel" id="panel-keyword">
+      <div class="card">
+        <div class="card-title">주제 입력</div>
+        <div style="display:flex;gap:8px">
+          <input class="input-area" id="kw-input" style="resize:none;height:40px;padding:9px 12px" placeholder="주제어를 입력하세요 (예: 강남 오마카세)" />
+          <button class="run-btn" style="width:auto;padding:0 18px;white-space:nowrap" onclick="runKeyword()">분석</button>
+        </div>
+      </div>
+      <div class="keyword-tools">
+        <a class="tool-link" onclick="openLink('https://searchad.naver.com/keyword-tool')" href="javascript:void(0)">
+          <div><div class="tool-name">네이버 키워드 도구</div><div class="tool-desc">월간 검색량 · 경쟁도 확인</div></div>
+          <div class="tool-arrow">→</div>
+        </a>
+        <a class="tool-link" onclick="openLink('https://www.blackkiwi.net')" href="javascript:void(0)">
+          <div><div class="tool-name">블랙키위</div><div class="tool-desc">네이버 세부 키워드 분석</div></div>
+          <div class="tool-arrow">→</div>
+        </a>
+        <a class="tool-link" onclick="openLink('https://keywordmaster.co.kr')" href="javascript:void(0)">
+          <div><div class="tool-name">키워드 마스터</div><div class="tool-desc">네이버 키워드 무료 조회</div></div>
+          <div class="tool-arrow">→</div>
+        </a>
+        <a class="tool-link" onclick="openLink('https://ads.google.com/aw/keywordplanner')" href="javascript:void(0)">
+          <div><div class="tool-name">구글 키워드 플래너</div><div class="tool-desc">구글/티스토리 SEO용</div></div>
+          <div class="tool-arrow">→</div>
+        </a>
+      </div>
+      <div class="card">
+        <div class="card-title">AI 키워드 제안</div>
+        <div id="kw-result"><span class="result-placeholder" style="font-size:13px">주제어를 입력하면 관련 키워드를 제안해드립니다.</span></div>
+        <div id="kw-loading" style="display:none;color:var(--text2);font-size:13px"><div class="spinner"></div> 분석 중...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let apiKey = '';
+let postType = 'review';
+let uploadedImages = [];
+const MAX_IMAGES = 20;
+
+function showPanel(name, tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  tab.classList.add('active');
+}
+
+function saveKey() {
+  const v = document.getElementById('apikey').value.trim();
+  if (!v) return;
+  apiKey = v;
+  document.getElementById('key-status').innerHTML = '<div class="key-saved">API 키가 저장되었습니다.</div>';
+}
+
+function setType(type, btn) {
+  postType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('type-desc').textContent = type === 'review'
+    ? '후기 포스팅: 경험 중심의 자연스러운 서술로 네이버 노출에 유리한 구조로 작성합니다.'
+    : '정보성 포스팅: 검색 의도를 반영한 구조적 정보 제공으로 SEO 친화적으로 작성합니다.';
+}
+
+function copyResult(id) {
+  navigator.clipboard.writeText(document.getElementById(id).innerText).catch(()=>{});
+}
+
+function onDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function onDragLeave() { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  handleFiles(Array.from(e.dataTransfer.files));
+}
+function onFileChange(e) {
+  handleFiles(Array.from(e.target.files));
+  e.target.value = '';
+}
+
+function handleFiles(files) {
+  const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+  files = files.filter(f => allowed.includes(f.type));
+  const remaining = MAX_IMAGES - uploadedImages.length;
+  if (remaining <= 0) { alert('최대 20장까지 업로드할 수 있어요.'); return; }
+  if (files.length > remaining) {
+    alert(`${remaining}장만 더 추가할 수 있어요. (현재 ${uploadedImages.length}장 / 최대 20장)`);
+    files = files.slice(0, remaining);
+  }
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedImages.push({ dataUrl: e.target.result, file });
+      renderPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeImage(idx) {
+  uploadedImages.splice(idx, 1);
+  renderPreviews();
+}
+
+function renderPreviews() {
+  const grid = document.getElementById('preview-grid');
+  const countEl = document.getElementById('img-count');
+  const barWrap = document.getElementById('img-bar-wrap');
+  const bar = document.getElementById('img-bar');
+  const indicator = document.getElementById('img-active-indicator');
+  const indicatorText = document.getElementById('img-active-text');
+  const n = uploadedImages.length;
+
+  grid.innerHTML = uploadedImages.map((img, i) =>
+    `<div class="preview-item">
+      <img src="${img.dataUrl}" />
+      <button class="preview-remove" onclick="removeImage(${i})">✕</button>
+    </div>`
+  ).join('');
+
+  if (n > 0) {
+    const pct = Math.round((n / MAX_IMAGES) * 100);
+    barWrap.style.display = 'block';
+    bar.style.width = pct + '%';
+    bar.className = 'img-bar' + (n >= MAX_IMAGES ? ' full' : n >= 15 ? ' warn' : '');
+    countEl.textContent = `${n}장 업로드됨 (최대 ${MAX_IMAGES}장)`;
+    indicator.style.display = 'inline-flex';
+    indicatorText.textContent = `사진 ${n}장 분석 포함`;
+  } else {
+    barWrap.style.display = 'none';
+    countEl.textContent = '';
+    indicator.style.display = 'none';
+  }
+}
+
+function getBase64(dataUrl) { return dataUrl.split(',')[1]; }
+function getMimeType(dataUrl) { return dataUrl.split(';')[0].split(':')[1]; }
+
+async function callClaude(system, userContent) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system,
+      messages: [{ role: 'user', content: userContent }]
+    })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content.map(c => c.text || '').join('');
+}
+
+async function runWriting() {
+  if (!apiKey) { alert('API 키를 먼저 저장해주세요.'); return; }
+  const topic = document.getElementById('topic').value.trim();
+  if (!topic && uploadedImages.length === 0) { alert('사진을 올리거나 소재를 입력해주세요.'); return; }
+  const platform = document.getElementById('platform').value;
+  const tone = document.getElementById('tone').value;
+  const btn = document.getElementById('write-btn');
+  const result = document.getElementById('writing-result');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>생성 중...';
+  result.innerHTML = '<span class="result-placeholder">작성 중입니다...</span>';
+
+  const platformGuide = platform === 'naver'
+    ? '네이버 블로그 SEO에 최적화: 자연스러운 키워드 배치, 소제목 활용, 2000자 내외'
+    : '티스토리 SEO에 최적화: 구조적 헤딩 사용, 검색 의도 반영, 구글 SEO 친화적';
+
+  const system = postType === 'review'
+    ? `당신은 한국 블로그 포스팅 전문 작가입니다. 후기 포스팅을 ${tone} 말투로 작성합니다. ${platformGuide}. 업로드된 사진이 있으면 사진 속 장면, 음식, 공간 등을 생생하게 묘사하여 포스팅에 반영하세요.`
+    : `당신은 한국 블로그 정보성 콘텐츠 전문 작가입니다. 정보성 포스팅을 ${tone} 말투로 작성합니다. ${platformGuide}. 업로드된 사진이 있으면 사진 속 내용을 분석하여 정보 제공에 활용하세요.`;
+
+  const userContent = [];
+  uploadedImages.forEach(img => {
+    userContent.push({ type: 'image', source: { type: 'base64', media_type: getMimeType(img.dataUrl), data: getBase64(img.dataUrl) } });
+  });
+
+  const textPart = uploadedImages.length > 0
+    ? `위 사진 ${uploadedImages.length}장을 분석해서 블로그 포스팅을 작성해주세요.${topic ? `\n\n추가 소재/설명: ${topic}` : ''}\n\n제목 포함, 소제목 구분하여 작성해주세요.`
+    : `다음 소재로 블로그 포스팅을 작성해주세요:\n\n${topic}\n\n제목 포함, 소제목 구분하여 작성해주세요.`;
+  userContent.push({ type: 'text', text: textPart });
+
+  try {
+    const text = await callClaude(system, userContent);
+    result.textContent = text;
+  } catch (e) {
+    result.innerHTML = `<span style="color:var(--red)">오류: ${e.message || 'API 키를 확인해주세요.'}</span>`;
+  }
+  btn.disabled = false;
+  btn.textContent = '포스팅 생성하기';
+}
+
+async function runThumb() {
+  if (!apiKey) { alert('API 키를 먼저 저장해주세요.'); return; }
+  const topic = document.getElementById('thumb-topic').value.trim();
+  if (!topic) { alert('소재를 입력해주세요.'); return; }
+  const platform = document.getElementById('thumb-platform').value;
+  document.getElementById('thumb-result-area').style.display = 'none';
+  document.getElementById('thumb-loading').style.display = 'block';
+  try {
+    const raw = await callClaude(
+      `당신은 한국 블로그 마케팅 전문가입니다. JSON만 반환하세요.`,
+      [{ type:'text', text:`다음 소재를 분석해서 ${platform === 'naver' ? '네이버 블로그' : '티스토리'}에 최적화된 결과를 JSON으로 반환하세요.\n소재: ${topic}\n\n{"titles":["제목1","제목2","제목3"],"tags":["태그1","태그2","태그3","태그4","태그5","태그6","태그7","태그8","태그9","태그10"],"thumbnail_text":["썸네일 메인 텍스트","썸네일 서브 텍스트"],"thumbnail_tip":"썸네일 색상/구도 제안"}` }]
+    );
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    document.getElementById('thumb-titles').innerHTML = data.titles.map((t,i) =>
+      `<div class="thumb-card"><div class="thumb-label">제목 ${i+1}</div><div class="thumb-val">${t}</div></div>`).join('');
+    document.getElementById('thumb-tags').innerHTML = data.tags.map(t => `<span class="tag">#${t}</span>`).join('');
+    document.getElementById('thumb-text').innerHTML = `<div style="margin-bottom:8px"><span style="color:var(--text3);font-size:11px">메인</span><br>${data.thumbnail_text[0]}</div><div style="margin-bottom:8px"><span style="color:var(--text3);font-size:11px">서브</span><br>${data.thumbnail_text[1]||''}</div><div><span style="color:var(--text3);font-size:11px">색상/구도</span><br>${data.thumbnail_tip||''}</div>`;
+    document.getElementById('thumb-loading').style.display = 'none';
+    document.getElementById('thumb-result-area').style.display = 'block';
+  } catch(e) {
+    document.getElementById('thumb-loading').innerHTML = '<span style="color:var(--red)">오류가 발생했습니다.</span>';
+  }
+}
+
+async function runSEO() {
+  if (!apiKey) { alert('API 키를 먼저 저장해주세요.'); return; }
+  const content = document.getElementById('seo-content').value.trim();
+  if (!content) { alert('포스팅 내용을 붙여넣어 주세요.'); return; }
+  const platform = document.getElementById('seo-platform').value;
+  document.getElementById('seo-result-area').style.display = 'none';
+  document.getElementById('seo-loading').style.display = 'block';
+  try {
+    const raw = await callClaude(
+      `당신은 한국 블로그 SEO 전문가입니다. JSON만 반환하세요.`,
+      [{ type:'text', text:`다음 포스팅을 ${platform} 기준으로 SEO 분석해주세요.\n포스팅:\n${content.substring(0,1500)}\n\n{"naver_score":85,"google_score":78,"checks":[{"label":"제목 키워드 포함","status":"ok","note":""},{"label":"본문 길이 (2000자 이상)","status":"warn","note":"현재 1200자"},{"label":"소제목(H2/H3) 활용","status":"ok","note":""},{"label":"키워드 밀도","status":"ok","note":""},{"label":"내부 링크","status":"bad","note":"내부 링크 없음"},{"label":"이미지 ALT 텍스트","status":"none","note":"확인 필요"}],"suggestions":["개선 제안 1","개선 제안 2","개선 제안 3"]}` }]
+    );
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const grid = document.getElementById('seo-grid');
+    let html = '';
+    if (data.naver_score !== undefined) html += `<div class="card" style="text-align:center"><div class="card-title">네이버 SEO 점수</div><div style="font-size:36px;font-weight:500;margin:10px 0;color:${data.naver_score>=80?'var(--green)':data.naver_score>=60?'var(--amber)':'var(--red)'}">${data.naver_score}</div><div style="font-size:11px;color:var(--text3)">/ 100</div></div>`;
+    if (data.google_score !== undefined) html += `<div class="card" style="text-align:center"><div class="card-title">구글 SEO 점수</div><div style="font-size:36px;font-weight:500;margin:10px 0;color:${data.google_score>=80?'var(--green)':data.google_score>=60?'var(--amber)':'var(--red)'}">${data.google_score}</div><div style="font-size:11px;color:var(--text3)">/ 100</div></div>`;
+    grid.innerHTML = html;
+    if (data.checks) {
+      const c = document.createElement('div');
+      c.className = 'card';
+      c.style.cssText = 'margin-top:14px;grid-column:1/-1';
+      c.innerHTML = `<div class="card-title">체크리스트</div><ul class="check-list">${data.checks.map(c=>`<li><div class="dot-${c.status}"></div><span>${c.label}${c.note?`<span style="color:var(--text3);font-size:11px;margin-left:6px">${c.note}</span>`:''}</span></li>`).join('')}</ul>`;
+      grid.appendChild(c);
+    }
+    document.getElementById('seo-suggestions').innerHTML = (data.suggestions||[]).map((s,i)=>`<div style="padding:6px 0;border-bottom:1px solid var(--bg4)">${i+1}. ${s}</div>`).join('');
+    document.getElementById('seo-loading').style.display = 'none';
+    document.getElementById('seo-result-area').style.display = 'block';
+  } catch(e) {
+    document.getElementById('seo-loading').innerHTML = '<span style="color:var(--red)">오류가 발생했습니다.</span>';
+  }
+}
+
+async function runKeyword() {
+  if (!apiKey) { alert('API 키를 먼저 저장해주세요.'); return; }
+  const kw = document.getElementById('kw-input').value.trim();
+  if (!kw) return;
+  const result = document.getElementById('kw-result');
+  const loading = document.getElementById('kw-loading');
+  result.style.display = 'none';
+  loading.style.display = 'block';
+  try {
+    const raw = await callClaude(
+      `당신은 한국 블로그 키워드 전문가입니다. JSON만 반환하세요.`,
+      [{ type:'text', text:`"${kw}" 주제로 블로그 포스팅에 활용할 키워드를 분석해주세요.\n{"main_keywords":["메인 키워드1","메인 키워드2","메인 키워드3"],"long_tail":["롱테일1","롱테일2","롱테일3","롱테일4","롱테일5"],"naver_tip":"네이버 노출 팁","google_tip":"구글/티스토리 SEO 팁"}` }]
+    );
+    const data = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    loading.style.display = 'none';
+    result.style.display = 'block';
+    result.innerHTML = `
+      <div style="margin-bottom:12px"><div class="card-title" style="margin-bottom:8px">메인 키워드</div><div class="keyword-tags">${(data.main_keywords||[]).map(k=>`<span class="kwbadge">${k}</span>`).join('')}</div></div>
+      <div style="margin-bottom:12px"><div class="card-title" style="margin-bottom:8px">롱테일 키워드</div><div class="keyword-tags">${(data.long_tail||[]).map(k=>`<span class="kwbadge">${k}</span>`).join('')}</div></div>
+      <div class="divider"></div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7">
+        <div style="margin-bottom:6px"><span style="color:var(--accent);font-size:11px">네이버</span> ${data.naver_tip||''}</div>
+        <div><span style="color:var(--green);font-size:11px">구글</span> ${data.google_tip||''}</div>
+      </div>`;
+  } catch(e) {
+    loading.innerHTML = '<span style="color:var(--red)">오류가 발생했습니다.</span>';
+  }
+}
+</script>
